@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
-import { FOOD_ITEMS, type FoodItem } from '~/composables/useInvitation'
+import { reactive, ref, onBeforeUnmount } from 'vue';
+import { FOOD_ITEMS, useInvitation, type FoodItem } from '~/composables/useInvitation'
 
 const { state, addFood, removeFood, isFoodSelected, MAX_FOODS } = useInvitation()
 

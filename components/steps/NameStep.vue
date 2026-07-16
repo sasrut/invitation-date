@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-const { state } = useInvitation()
+import { useInvitation } from '~/composables/useInvitation';
+
+const { state } = useInvitation() 
 
 const name = ref(state.value.name)
 const phone = ref(state.value.crushPhone)

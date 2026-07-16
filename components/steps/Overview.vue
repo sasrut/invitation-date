@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { toPng, toBlob } from 'html-to-image'
 import { useInvitation } from '~/composables/useInvitation'
-
+import { useState } from '#app';
+import { ref, computed } from 'vue';
 const { state, formattedDate, formattedTime } = useInvitation()
 const emit = defineEmits<{ back: [] }>()
 

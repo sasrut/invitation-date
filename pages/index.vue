@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useInvitation } from '~/composables/useInvitation'
+
 const { state } = useInvitation()
 
 const introPhase = ref<'text' | 'bouquet' | 'envelope' | 'done'>('text')

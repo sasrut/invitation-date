@@ -1,3 +1,6 @@
+import { computed } from 'vue'
+import { useState } from '#app'
+
 export interface FoodItem {
   id: string
   label: string
