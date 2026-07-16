@@ -1,30 +1,17 @@
-import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/vue-bundle-renderer/dist/runtime.mjs';
-import { getQuery, createError, getResponseStatusText, getResponseStatus } from 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/h3/dist/index.mjs';
-import { u as useRuntimeConfig, a as useStorage, d as defineRenderHandler, g as getRouteRules, b as useNitroApp } from '../nitro/nitro.mjs';
-import { joinRelativeURL, encodePath } from 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/ufo/dist/index.mjs';
-import { createHead as createHead$1, propsToString, renderSSRHead } from 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/unhead/dist/server.mjs';
-import { AsyncLocalStorage } from 'node:async_hooks';
-import { stringify, uneval } from 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/devalue/index.js';
-import { isRef, toValue } from 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/vue/index.mjs';
-import { DeprecationsPlugin, PromisesPlugin, TemplateParamsPlugin, AliasSortingPlugin } from 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/unhead/dist/plugins.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/destr/dist/index.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/hookable/dist/index.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/ofetch/dist/node.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/node-mock-http/dist/index.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/unstorage/dist/index.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/unstorage/drivers/fs.mjs';
-import 'node:crypto';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/unstorage/drivers/fs-lite.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/unstorage/drivers/lru-cache.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/ohash/dist/index.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/klona/dist/index.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/defu/dist/defu.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/scule/dist/index.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/unctx/dist/index.mjs';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/radix3/dist/index.mjs';
+import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'vue-bundle-renderer/runtime';
+import { j as joinRelativeURL, u as useRuntimeConfig, e as encodePath, d as defineRenderHandler, g as getQuery, c as createError, a as getRouteRules, b as getResponseStatusText, f as getResponseStatus, h as useNitroApp } from '../nitro/nitro.mjs';
+import { createHead as createHead$1, propsToString, renderSSRHead } from 'unhead/server';
+import { stringify, uneval } from 'devalue';
+import { isRef, toValue } from 'vue';
+import { DeprecationsPlugin, PromisesPlugin, TemplateParamsPlugin, AliasSortingPlugin } from 'unhead/plugins';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
 import 'node:fs';
+import 'node:path';
+import 'node:crypto';
 import 'node:url';
-import 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/pathe/dist/index.mjs';
 
 const VueResolver = (_, value) => {
   return isRef(value) ? toValue(value) : value;
@@ -137,11 +124,6 @@ function getRenderer(ssrContext) {
 	return getSPARenderer() ;
 }
 
-const prerenderRenderingURLs = new AsyncLocalStorage() ;
-useStorage("internal:nuxt:prerender:payload") ;
-useStorage("internal:nuxt:prerender:island") ;
-useStorage("internal:nuxt:prerender:island-props") ;
-
 function renderPayloadJsonScript(opts) {
 	const contents = opts.data ? encodeForwardSlashes(stringify(opts.data, opts.ssrContext["~payloadReducers"])) : "";
 	const payload = {
@@ -191,9 +173,6 @@ function createSSRContext(event) {
 		["~payloadReducers"]: Object.create(null),
 		modules: new Set()
 	};
-	{
-		ssrContext.payload.prerenderedAt = Date.now();
-	}
 	return ssrContext;
 }
 function setSSRError(ssrContext, error) {
@@ -220,23 +199,6 @@ const handler = defineRenderHandler((event) => {
 			statusText: "Page Not Found: /__nuxt_error",
 			message: "Page Not Found: /__nuxt_error"
 		});
-	}
-	
-	
-	
-	
-	if (prerenderRenderingURLs) {
-		const url = new URL(event.path, "http://localhost");
-		const renderingURL = url.pathname + url.search;
-		const stack = prerenderRenderingURLs.getStore();
-		if (stack?.includes(renderingURL)) {
-			const chain = [...stack, renderingURL].filter((u) => !u.startsWith("/__nuxt_error")).map((u) => `"${u}"`).join(" -> ");
-			throw createError({
-				status: 508,
-				statusText: `Loop detected while prerendering "${renderingURL}" (${chain}). Check for \`useFetch\`/\`$fetch\` calls targeting a URL that is currently being rendered.`
-			});
-		}
-		return prerenderRenderingURLs.run([...stack || [], renderingURL], () => renderRoute(event, ssrError));
 	}
 	return renderRoute(event, ssrError);
 });

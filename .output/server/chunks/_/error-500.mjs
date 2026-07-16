@@ -1,4 +1,4 @@
-import { escapeHtml } from 'file:///Users/amartekadmin/Documents/GitHub/invitation-date/node_modules/@vue/shared/dist/shared.cjs.prod.js';
+import { escapeHtml } from '@vue/shared';
 
 const _messages = {
 	"appName": "Nuxt",
