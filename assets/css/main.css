@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #__nuxt {
+  height: 100%;
+}
+
+body {
+  @apply font-body text-ink;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* ===== Soft Outline ===== */
+.soft-outline {
+  border: 1.5px solid theme('colors.rose.200');
+}
+
+/* ===== Scrollbar ===== */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+/* ===== Halftone (kept only for tiny bg accents) ===== */
+.halftone {
+  background-image: radial-gradient(currentColor 1.4px, transparent 1.4px);
+  background-size: 12px 12px;
+}
+
+/* ===== Envelope Theme ===== */
+
+.envelope-back {
+  position: relative;
+  background: linear-gradient(175deg,
+    theme('colors.rose.200') 0%,
+    theme('colors.rose.100') 40%,
+    theme('colors.rose.50') 70%,
+    #fff5f2 100%
+  );
+}
+
+.envelope-back::before,
+.envelope-back::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 50%;
+  height: 50%;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.envelope-back::before {
+  left: 0;
+  background: linear-gradient(to top right, rgba(74,32,32,0.1) 0%, transparent 60%);
+  clip-path: polygon(0 100%, 100% 0, 0 0);
+}
+
+.envelope-back::after {
+  right: 0;
+  background: linear-gradient(to top left, rgba(74,32,32,0.1) 0%, transparent 60%);
+  clip-path: polygon(100% 100%, 100% 0, 0 0);
+}
+
+.envelope-flap {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  z-index: 3;
+  width: 85%;
+  height: 88px;
+  transform: translateX(-50%);
+  transform-origin: top center;
+  clip-path: polygon(50% 0%, 2% 100%, 98% 100%);
+  background: linear-gradient(180deg, theme('colors.rose.300'), theme('colors.rose.200'));
+}
+
+.envelope-flap::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  background: rgba(184,90,82,0.15);
+}
+
+.envelope-card {
+  position: relative;
+  z-index: 2;
+  background-color: #fff;
+}
+
+/* ===== Paper Textures ===== */
+
+.paper-texture {
+  background-image:
+    radial-gradient(circle, rgba(184,90,82,0.04) 0.5px, transparent 0.5px);
+  background-size: 18px 18px;
+}
+
+.linen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(184,90,82,0.015) 2px, rgba(184,90,82,0.015) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(184,90,82,0.008) 2px, rgba(184,90,82,0.008) 4px);
+}
+
+.ruled-lines {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 32px,
+    rgba(184,90,82,0.04) 33px
+  );
+}
+
+/* ===== Wax Seal (soft coral version) ===== */
+
+.wax-seal {
+  background: radial-gradient(circle at 40% 35%,
+    theme('colors.rose.400'),
+    #D9857A 45%,
+    #C87066 80%,
+    #B05A52 100%
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.2),
+    inset 0 -2px 4px rgba(0,0,0,0.08),
+    0 4px 16px rgba(184,90,82,0.2);
+}
+
+/* ===== Input Glow ===== */
+.input-glow:focus {
+  border-color: theme('colors.rose.400');
+  box-shadow: 0 0 0 3px rgba(232,149,142,0.12);
+  outline: none;
+}
+
+/* ===== Stamp Edge ===== */
+.stamp-edge {
+  background-image:
+    radial-gradient(circle at 0 0, transparent 0, transparent 3px, rgba(61,44,46,0.1) 3px, rgba(61,44,46,0.1) 4px, transparent 4px);
+  background-size: 10px 10px;
+}
+
+/* ===== Animations ===== */
+
+@keyframes ghost-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.ghost-pulse {
+  animation: ghost-pulse .5s ease-in-out infinite;
+}
+
+/* Step transition */
+.slide-enter-active {
+  transition: all .35s cubic-bezier(.34,1.56,.64,1);
+}
+.slide-leave-active {
+  transition: all .2s ease;
+}
+.slide-enter-from {
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+}
+.slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+}
+
+/* Alert pop */
+.alert-pop-enter-active {
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.alert-pop-leave-active {
+  transition: opacity .2s ease;
+}
+.alert-pop-enter-from {
+  opacity: 0;
+  transform: scale(0.8) translateY(-8px);
+}
+.alert-pop-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* Fade up */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .25s ease, transform .25s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
+}
