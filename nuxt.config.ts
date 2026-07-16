@@ -23,17 +23,17 @@ export default defineNuxtConfig({
       ]
     }
   },
-  hooks: {
-    'vite:extendConfig'(config) {
-      if (config.build?.rollupOptions?.input) {
-        const input = config.build.rollupOptions.input as any
-        if (typeof input === 'object' && !Array.isArray(input)) {
-          if (input.entry && !input.server) {
-            input.server = input.entry
-          }
-        }
-      }
-    }
-  }
+  // hooks: {
+  //   'vite:extendConfig'(config) {
+  //     if (config.build?.rollupOptions?.input) {
+  //       const input = config.build.rollupOptions.input as any
+  //       if (typeof input === 'object' && !Array.isArray(input)) {
+  //         if (input.entry && !input.server) {
+  //           input.server = input.entry
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 })
 
