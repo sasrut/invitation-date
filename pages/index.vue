@@ -83,10 +83,6 @@ onMounted(() => {
               />
             </Transition>
           </div>
-
-          <div class="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[10px] text-gray-300 select-none">
-            ✨ by github.com/sasrut
-          </div>
         </div>
 
         <div class="wax-seal animate-seal-press absolute z-20 flex h-12 w-12 items-center justify-center rounded-full" style="top:0; left:50%; transform:translate(-50%,-50%)">
@@ -94,7 +90,9 @@ onMounted(() => {
         </div>
       </div>
     </Transition>
-
+    <div class="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[10px] text-gray-300 select-none">
+      ✨ by github.com/sasrut
+    </div>
   </div>
 </template>
 
