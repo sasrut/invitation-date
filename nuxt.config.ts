@@ -34,6 +34,11 @@ export default defineNuxtConfig({
         input.server = input.entry
       }
     }
+  },
+  vite: {
+    build: {
+      cssCodeSplit: false
+    }
   }
 })
 
