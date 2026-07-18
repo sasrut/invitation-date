@@ -2,7 +2,7 @@
 import { toPng, toBlob } from 'html-to-image'
 import { useInvitation } from '~/composables/useInvitation'
 import { useState } from '#app';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 const { state, formattedDate, formattedTime } = useInvitation()
 const emit = defineEmits<{ back: [] }>()
 
@@ -10,6 +10,18 @@ const cardRef = ref<HTMLElement | null>(null)
 const busy = ref<'send' | 'download' | null>(null)
 const note = ref('')
 const noteType = ref<'success' | 'error' | null>(null)
+
+let noteTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(note, (val) => {
+  if (noteTimer) clearTimeout(noteTimer)
+  if (val) {
+    noteTimer = setTimeout(() => {
+      note.value = ''
+      noteType.value = null
+    }, 5800)
+  }
+})
 
 const dayNumber = computed(() => state.value.date ? new Date(`${state.value.date}T00:00:00`).getDate() : '')
 const monthShort = computed(() => state.value.date ? new Date(`${state.value.date}T00:00:00`).toLocaleDateString('en-US', { month: 'short' }) : '')

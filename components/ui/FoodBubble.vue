@@ -19,6 +19,6 @@ defineProps<{
     >
       <UiEmoji :e="emoji" size="h-8 w-8" />
     </div>
-    <span class="text-[11px] font-semibold text-ink/60">{{ label }}</span>
+    <span class="text-[9px] font-semibold text-ink/60">{{ label }}</span>
   </button>
 </template>

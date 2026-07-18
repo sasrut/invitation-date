@@ -65,7 +65,7 @@ const canContinue = computed(() => !!state.value.date && !!state.value.time)
         class="flex-1 rounded-2xl bg-rose-400 py-3 font-display text-sm font-bold text-white shadow-elegant-md transition-all duration-200 disabled:opacity-30 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-elegant-lg"
         @click="emit('next')"
       >
-        Next: review invite →
+        Next: review invite
       </button>
     </div>
   </div>

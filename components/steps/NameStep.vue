@@ -33,7 +33,7 @@ function submit () {
     <h1 class="text-center font-display text-2xl font-bold text-ink">
       I Hope You'll Say Yes
     </h1>
-    <p class="mt-1 text-center text-sm text-ink/55">
+    <p class="mt-1 text-center text-xs text-ink/55">
       Just a couple of details before I ask if you'd like to spend some time with me.
     </p>
 
@@ -66,7 +66,7 @@ function submit () {
         type="submit"
         class="mt-1 w-full rounded-2xl bg-rose-400 py-3 font-display text-sm font-bold text-white shadow-elegant-md transition-all duration-200 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-elegant-lg"
       >
-        Let's go →
+        Let's go
       </button>
     </form>
   </div>

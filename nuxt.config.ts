@@ -18,22 +18,19 @@ export default defineNuxtConfig({
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap'
+          href: 'https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@600;700&family=Poppins:wght@400;500;600;700&family=Rouge+Script&display=swap'
         }
       ]
     }
   },
-  // hooks: {
-  //   'vite:extendConfig'(config) {
-  //     if (config.build?.rollupOptions?.input) {
-  //       const input = config.build.rollupOptions.input as any
-  //       if (typeof input === 'object' && !Array.isArray(input)) {
-  //         if (input.entry && !input.server) {
-  //           input.server = input.entry
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+  hooks: {
+    'vite:extendConfig'(config: any) {
+      const input = config.environments?.ssr?.build?.rollupOptions?.input
+        ?? config.build?.rollupOptions?.input
+      if (input && typeof input === 'object' && !Array.isArray(input) && !input.server) {
+        input.server = input.entry
+      }
+    }
+  }
 })
 

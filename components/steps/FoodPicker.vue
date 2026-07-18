@@ -73,8 +73,8 @@ onBeforeUnmount(() => {
   <div>
     <div class="text-center">
       <h2 class="font-display text-2xl font-bold text-ink">What would make you smile? 🍽️</h2>
-      <p class="mt-1 text-sm text-ink/50">
-        Drag to Choose up to {{ MAX_FOODS }} dishes you'd enjoy sharing with me.
+      <p class="mt-1 text-xs text-ink/50">
+        Drag/Click to Choose up to {{ MAX_FOODS }} dishes you'd enjoy sharing with me.
       </p>
     </div>
 
@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
       class="mt-6 w-full rounded-2xl bg-rose-400 py-3 font-display text-sm font-bold text-white shadow-elegant-md transition-all duration-200 disabled:opacity-30 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-elegant-lg"
       @click="emit('next')"
     >
-      Next: pick a date →
+      Next: pick a date
     </button>
 
     <Teleport to="body">

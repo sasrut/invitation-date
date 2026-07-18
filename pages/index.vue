@@ -6,15 +6,23 @@ const { state } = useInvitation()
 
 const introPhase = ref<'text' | 'bouquet' | 'envelope' | 'done'>('text')
 
+const timers: ReturnType<typeof setTimeout>[] = []
+
 onMounted(() => {
-  setTimeout(() => { introPhase.value = 'bouquet' }, 2000)
-  setTimeout(() => { introPhase.value = 'envelope' }, 6200)
-  setTimeout(() => { introPhase.value = 'done' }, 9000)
+  timers.push(setTimeout(() => { introPhase.value = 'bouquet' }, 2000))
+  timers.push(setTimeout(() => { introPhase.value = 'envelope' }, 7800))
+  timers.push(setTimeout(() => { introPhase.value = 'done' }, 8000))
 })
+
+function skipIntro() {
+  timers.forEach(clearTimeout)
+  state.value.step = 1
+  introPhase.value = 'done'
+}
 </script>
 
 <template>
-  <div class="relative flex min-h-screen w-full items-center justify-center p-4 sm:p-6">
+  <div class="relative flex h-screen overflow-hidden w-full items-center justify-center p-4 sm:p-6">
 
     <!-- Text intro -->
     <Transition name="text-fade">
@@ -34,7 +42,7 @@ onMounted(() => {
         v-if="introPhase === 'bouquet'"
         class="fixed inset-0 z-50 flex items-center justify-center bg-cream"
       >
-        <span class="text-7xl animate-bouquet-in select-none pointer-events-none">💐</span>
+        <img src="/flower-bouquet.png" class="h-24 w-24 animate-bouquet-in select-none pointer-events-none" alt="" />
       </div>
     </Transition>
 
@@ -53,12 +61,10 @@ onMounted(() => {
           <div class="halftone text-rose-300 absolute bottom-3 left-3 h-12 w-12 opacity-15 -rotate-12" />
         </div>
 
-        <div class="envelope-flap animate-unfold" />
+        <div class="z-[5] envelope-flap animate-unfold" />
 
-        <div class="envelope-card p-6 overflow-y-scroll max-h-[600px] relative overflow-hidden rounded-b-[24px] rounded-t-[10px] shadow-elegant-lg paper-texture linen">
-          <div class="scrollbar-none relative max-h-[88vh] overflow-y-auto px-5 pt-7 pb-6 sm:px-7 ruled-lines">
-            <UiStepDots :step="state.step" />
-
+        <div class="z-[10] envelope-card p-6 overflow-y-scroll max-h-[465px] h-full relative overflow-hidden rounded-[10px] shadow-elegant-lg paper-texture linen">
+          <div class="scrollbar-none relative overflow-y-auto ruled-lines">
             <Transition name="slide" mode="out-in">
               <StepsNameStep
                 v-if="state.step === 1"
@@ -86,13 +92,29 @@ onMounted(() => {
         </div>
 
         <div class="wax-seal animate-seal-press absolute z-20 flex h-12 w-12 items-center justify-center rounded-full" style="top:0; left:50%; transform:translate(-50%,-50%)">
-          <span class="text-sm leading-none heartbeat">💌</span>
+          <span class="text-xl leading-none heartbeat">🌼</span>
         </div>
       </div>
     </Transition>
+
+    <div
+      v-if="introPhase === 'envelope' || introPhase === 'done'"
+      class="pointer-events-none absolute top-3 inset-x-0 z-10 flex justify-center"
+    >
+      <UiStepDots :step="state.step" />
+    </div>
+
     <div class="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[10px] text-gray-300 select-none">
       ✨ by github.com/sasrut
     </div>
+
+    <button
+      v-if="introPhase !== 'done'"
+      class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[60] rounded-full bg-white/70 backdrop-blur-sm px-4 py-1.5 text-xs font-medium text-ink/30 hover:text-rose-400 transition-colors select-none cursor-pointer"
+      @click="skipIntro"
+    >
+      Skip
+    </button>
   </div>
 </template>
 

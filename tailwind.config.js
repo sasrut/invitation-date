@@ -39,6 +39,7 @@ export default {
       fontFamily: {
         display: ['"Baloo 2"', 'ui-rounded', 'sans-serif'],
         hand: ['"Caveat"', 'cursive'],
+        writing: ['"Rouge Script"', 'cursive'],
         body: ['Poppins', 'ui-sans-serif', 'sans-serif']
       },
       boxShadow: {
@@ -132,11 +133,11 @@ export default {
         'fall-1': 'fall-1 16s linear infinite',
         'fall-2': 'fall-2 18s linear infinite',
         'fall-3': 'fall-3 20s linear infinite',
-        unfold: 'unfold .5s .15s cubic-bezier(.4,0,.2,1) both',
-        'seal-press': 'seal-press .4s .55s cubic-bezier(.34,1.56,.64,1) both',
+        unfold: 'unfold 2.5s .3s cubic-bezier(.4,0,.2,1) both',
+        'seal-press': 'seal-press .8s 1.8s cubic-bezier(.34,1.56,.64,1) both',
         heartbeat: 'heartbeat 3s ease-in-out infinite',
         'fade-in': 'fade-in .4s ease-out both',
-        'reveal-in': 'reveal-in .7s cubic-bezier(.4,0,.2,1) both',
+        'reveal-in': 'reveal-in 1.2s cubic-bezier(.4,0,.2,1) both',
         'bouquet-in': 'bouquet-in 8s cubic-bezier(.4,0,.2,1) both'
       }
     }

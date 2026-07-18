@@ -12,9 +12,15 @@ const emit = defineEmits<{ remove: [id: string] }>()
 
 <template>
   <div
-    class="relative mx-auto flex w-full max-w-xs flex-col items-center gap-2 rounded-3xl border-2 border-dashed p-4 transition-all duration-200"
-    :class="active ? 'border-rose-400 bg-rose-50/60 scale-[1.02]' : 'border-rose-200 bg-white/80 paper-texture'"
+    class="relative mx-auto flex w-full max-w-xs flex-col items-center gap-2 py-4 rounded-3xl transition-all duration-200 overflow-hidden"
+    :class="active ? 'bg-rose-50/60 scale-[1.02]' : 'bg-white/80 paper-texture'"
   >
+    <div
+      class="pointer-events-none absolute inset-0 flex items-center justify-center select-none transition-all duration-200"
+      :class="active ? 'opacity-30' : 'opacity-20'"
+    >
+      <img src="/shopping-basket.png" class="w-full h-full object-contain object-bottom" alt="" />
+    </div>
     <div class="flex items-center gap-2 text-xs font-semibold text-rose-600">
       <UiEmoji e="🧺" size="h-5 w-5" />
       <span>Your basket</span>
@@ -23,7 +29,7 @@ const emit = defineEmits<{ remove: [id: string] }>()
 
     <div class="flex min-h-[56px] w-full items-center justify-center gap-3">
       <p v-if="items.length === 0" class="text-center text-[12px] text-ink/30">
-        Drag up to {{ max }} favorites here 👆
+        Drag/Click up to {{ max }} favorites here 👆
       </p>
       <button
         v-for="item in items"
