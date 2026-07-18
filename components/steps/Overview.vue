@@ -7,6 +7,7 @@ const { state, formattedDate, formattedTime } = useInvitation()
 const emit = defineEmits<{ back: [] }>()
 
 const cardRef = ref<HTMLElement | null>(null)
+const EXPORT_WIDTH = 1200
 const busy = ref<'send' | 'download' | null>(null)
 const note = ref('')
 const noteType = ref<'success' | 'error' | null>(null)
@@ -26,6 +27,12 @@ watch(note, (val) => {
 const dayNumber = computed(() => state.value.date ? new Date(`${state.value.date}T00:00:00`).getDate() : '')
 const monthShort = computed(() => state.value.date ? new Date(`${state.value.date}T00:00:00`).toLocaleDateString('en-US', { month: 'short' }) : '')
 
+function resetCardWidth() {
+  if (!cardRef.value) return
+  cardRef.value.style.width = ''
+  cardRef.value.style.maxWidth = ''
+}
+
 async function renderCard () {
   if (!cardRef.value) return null
   await document.fonts.ready
@@ -37,6 +44,8 @@ async function renderCard () {
         img.addEventListener('error', resolve, { once: true })
       })))
   await new Promise(r => setTimeout(r, 200))
+  cardRef.value.style.width = `${EXPORT_WIDTH}px`
+  cardRef.value.style.maxWidth = `${EXPORT_WIDTH}px`
   return cardRef.value
 }
 
@@ -65,24 +74,32 @@ async function handleDownload () {
     noteType.value = 'error'
   } finally {
     busy.value = null
+    resetCardWidth()
   }
 }
 
 async function handleSend () {
+  const phone = state.value.crushPhone.replace(/\D/g, '')
+  const shareText = `Hi! ${state.value.name || 'Someone'} sent you a little date invitation 💌`
+  const waText = encodeURIComponent(`${shareText} I just saved the invite card — attaching it right here!`)
+  const waUrl = `https://wa.me/${phone}?text=${waText}`
+  const waWindow = window.open(waUrl, '_blank')
+
   const el = await renderCard()
-  if (!el) return
+  if (!el) { waWindow?.close(); return }
   busy.value = 'send'
   note.value = ''
   noteType.value = null
+
   try {
     const blob = await toBlob(el, { pixelRatio: 1 })
     if (!blob) throw new Error('no blob')
 
     const file = new File([blob], 'date-invite.png', { type: 'image/png' })
-    const shareText = `Hi! ${state.value.name || 'Someone'} sent you a little date invitation 💌`
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: 'A date invitation 💌', text: shareText })
+      waWindow?.close()
       note.value = 'Yeayy! The card has been sent! 💌'
       noteType.value = 'success'
       return
@@ -90,19 +107,17 @@ async function handleSend () {
 
     const dataUrl = await toPng(el, { pixelRatio: 1 })
     triggerDownload(dataUrl)
-    const phone = state.value.crushPhone.replace(/\D/g, '')
-    const text = encodeURIComponent(`${shareText} I just saved the invite card — attaching it right here!`)
-    // window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
-    window.open(`https://wa.me/${phone}?text=${text}`, '_blank')
     note.value = 'Yeayy! Card saved — attach it in the WhatsApp chat that just opened 💬'
     noteType.value = 'success'
   } catch (err: any) {
+    waWindow?.close()
     if (err?.name !== 'AbortError') {
       note.value = 'Could not open share — try Download instead.'
       noteType.value = 'error'
     }
   } finally {
     busy.value = null
+    resetCardWidth()
   }
 }
 </script>
@@ -115,7 +130,7 @@ async function handleSend () {
     </div>
 
     <div class="mt-6 flex justify-center">
-      <div ref="cardRef" class="relative w-full max-w-[340px]">
+      <div ref="cardRef" class="relative w-full">
 
           <div class="relative overflow-hidden rounded-3xl border-2 border-rose-100/50 bg-white p-6 shadow-elegant-lg paper-texture linen">
 
