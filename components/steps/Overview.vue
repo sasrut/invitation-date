@@ -157,9 +157,9 @@ async function handleSend () {
                 <span class="text-[10px] font-bold uppercase text-rose-500">{{ monthShort }}</span>
                 <span class="font-display text-xl font-bold leading-none text-ink">{{ dayNumber }}</span>
               </div>
-              <div class="text-left">
-                <p class="font-display text-sm font-bold text-ink">{{ formattedDate }}</p>
-                <p class="text-xs font-semibold text-rose-600"><UiEmoji e="⏰" size="h-3.5 w-3.5" /> {{ formattedTime }}</p>
+              <div class="text-left w-full flex flex-col gap-1 justify-center items-stretch">
+                <p class="font-display w-full text-xs font-bold text-ink">{{ formattedDate }}</p>
+                <p class="text-xs w-full font-semibold text-rose-600"><UiEmoji e="⏰" size="h-3.5 w-3.5" /> {{ formattedTime }}</p>
               </div>
             </div>
 
