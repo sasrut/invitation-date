@@ -56,7 +56,7 @@ async function handleDownload () {
   note.value = ''
   noteType.value = null
   try {
-    const dataUrl = await toPng(el, { pixelRatio: 2 })
+    const dataUrl = await toPng(el, { pixelRatio: 1 })
     triggerDownload(dataUrl)
     note.value = 'Yeayy! The card has been downloaded! 💾'
     noteType.value = 'success'
@@ -75,7 +75,7 @@ async function handleSend () {
   note.value = ''
   noteType.value = null
   try {
-    const blob = await toBlob(el, { pixelRatio: 2 })
+    const blob = await toBlob(el, { pixelRatio: 1 })
     if (!blob) throw new Error('no blob')
 
     const file = new File([blob], 'date-invite.png', { type: 'image/png' })
@@ -88,12 +88,12 @@ async function handleSend () {
       return
     }
 
-    const dataUrl = await toPng(el, { pixelRatio: 2 })
+    const dataUrl = await toPng(el, { pixelRatio: 1 })
     triggerDownload(dataUrl)
     const phone = state.value.crushPhone.replace(/\D/g, '')
     const text = encodeURIComponent(`${shareText} I just saved the invite card — attaching it right here!`)
-    window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
-    // window.open(`https://wa.me/${phone}?text=${text}`, '_blank')
+    // window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    window.open(`https://wa.me/${phone}?text=${text}`, '_blank')
     note.value = 'Yeayy! Card saved — attach it in the WhatsApp chat that just opened 💬'
     noteType.value = 'success'
   } catch (err: any) {
