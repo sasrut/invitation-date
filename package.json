@@ -10,10 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "html-to-image": "^1.11.13",
+    "html2canvas": "^1.4.1",
     "nuxt": "^3.13.2",
     "vue": "^3.4.38",
-    "vue-router": "^4.4.3",
-    "html-to-image": "^1.11.11"
+    "vue-router": "^4.4.3"
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.12.1",

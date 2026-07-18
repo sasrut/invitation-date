@@ -33,7 +33,6 @@ export const FOOD_ITEMS: FoodItem[] = [
 export interface InvitationState {
   step: 1 | 2 | 3 | 4
   name: string
-  crushPhone: string
   foods: FoodItem[]
   date: string // yyyy-mm-dd
   time: string // HH:mm
@@ -45,7 +44,6 @@ export const useInvitation = () => {
   const state = useState<InvitationState>('invitation', () => ({
     step: 1,
     name: '',
-    crushPhone: '',
     foods: [],
     date: '',
     time: ''
@@ -79,7 +77,7 @@ export const useInvitation = () => {
   })
 
   const reset = () => {
-    state.value = { step: 1, name: '', crushPhone: '', foods: [], date: '', time: '' }
+    state.value = { step: 1, name: '', foods: [], date: '', time: '' }
   }
 
   return { state, MAX_FOODS, addFood, removeFood, isFoodSelected, formattedDate, formattedTime, reset }

@@ -1,13 +1,12 @@
 <script setup lang="ts">
+// import html2canvas from 'html2canvas'
 import { toPng, toBlob } from 'html-to-image'
 import { useInvitation } from '~/composables/useInvitation'
-import { useState } from '#app';
 import { ref, computed, watch } from 'vue';
 const { state, formattedDate, formattedTime } = useInvitation()
 const emit = defineEmits<{ back: [] }>()
 
 const cardRef = ref<HTMLElement | null>(null)
-const EXPORT_WIDTH = 680
 const busy = ref<'send' | 'download' | null>(null)
 const note = ref('')
 const noteType = ref<'success' | 'error' | null>(null)
@@ -27,12 +26,6 @@ watch(note, (val) => {
 const dayNumber = computed(() => state.value.date ? new Date(`${state.value.date}T00:00:00`).getDate() : '')
 const monthShort = computed(() => state.value.date ? new Date(`${state.value.date}T00:00:00`).toLocaleDateString('en-US', { month: 'short' }) : '')
 
-function cleanupExport(container: HTMLElement | null) {
-  if (container?.parentNode) {
-    container.remove()
-  }
-}
-
 async function renderCard () {
   if (!cardRef.value) return null
   await document.fonts.ready
@@ -43,21 +36,8 @@ async function renderCard () {
         img.addEventListener('load', resolve, { once: true })
         img.addEventListener('error', resolve, { once: true })
       })))
-
-  const wrapper = document.createElement('div')
-  wrapper.style.cssText = `position:fixed;left:-9999px;top:0;width:${EXPORT_WIDTH}px;max-width:none;`
-
-  const clone = cardRef.value.cloneNode(true) as HTMLElement
-  clone.style.width = `${EXPORT_WIDTH}px`
-  clone.style.maxWidth = `${EXPORT_WIDTH}px`
-
-  wrapper.appendChild(clone)
-  document.body.appendChild(wrapper)
-
-  clone.offsetHeight
-  await new Promise(r => requestAnimationFrame(r))
-
-  return { element: clone as HTMLElement, wrapper }
+  await new Promise(r => setTimeout(r, 200))
+  return cardRef.value
 }
 
 function triggerDownload (dataUrl: string) {
@@ -70,13 +50,13 @@ function triggerDownload (dataUrl: string) {
 }
 
 async function handleDownload () {
-  const result = await renderCard()
-  if (!result) return
+  const el = await renderCard()
+  if (!el) return
   busy.value = 'download'
   note.value = ''
   noteType.value = null
   try {
-    const dataUrl = await toPng(result.element, { pixelRatio: 1, width: EXPORT_WIDTH })
+    const dataUrl = await toPng(el, { pixelRatio: 2, skipFonts: true })
     triggerDownload(dataUrl)
     note.value = 'Yeayy! The card has been downloaded! 💾'
     noteType.value = 'success'
@@ -85,34 +65,46 @@ async function handleDownload () {
     noteType.value = 'error'
   } finally {
     busy.value = null
-    cleanupExport(result.wrapper)
   }
 }
 
 async function handleSend () {
-  const phone = state.value.crushPhone.replace(/\D/g, '')
-  const shareText = `Hi! ${state.value.name || 'Someone'} sent you a little date invitation 💌`
-  const waText = encodeURIComponent(`${shareText} I just saved the invite card — attaching it right here!`)
-  const waUrl = `https://wa.me/${phone}?text=${waText}`
-  window.open(waUrl, '_blank')
-
-  const result = await renderCard()
-  if (!result) return
+  const el = await renderCard()
+  if (!el) return
   busy.value = 'send'
   note.value = ''
   noteType.value = null
-
   try {
-    const dataUrl = await toPng(result.element, { pixelRatio: 1, width: EXPORT_WIDTH })
-    triggerDownload(dataUrl)
-    note.value = 'Yeayy! Card saved — attach it in the WhatsApp chat that just opened 💬'
-    noteType.value = 'success'
+    const blob = await toBlob(el, { pixelRatio: 2, skipFonts: true })
+    if (!blob) throw new Error('no blob')
+
+    const file = new File([blob], 'date-invite.png', { type: 'image/png' })
+    const shareText = `Hi! ${state.value.name || 'Someone'} sent you a little date invitation 💌`
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'A date invitation 💌', text: shareText })
+      note.value = 'Yeayy! The card has been sent! 💌'
+      noteType.value = 'success'
+      return
+    }
+
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ])
+      note.value = 'Card copied! Paste it into your chat app 📋'
+      noteType.value = 'success'
+    } catch {
+      note.value = 'Could not copy — try Download instead.'
+      noteType.value = 'error'
+    }
   } catch (err: any) {
-    note.value = 'Could not create the image. Try again?'
-    noteType.value = 'error'
+    if (err?.name !== 'AbortError') {
+      note.value = 'Could not open share — try Download instead.'
+      noteType.value = 'error'
+    }
   } finally {
     busy.value = null
-    cleanupExport(result.wrapper)
   }
 }
 </script>
@@ -120,72 +112,70 @@ async function handleSend () {
 <template>
   <div>
     <div class="text-center">
-      <h2 class="font-display text-2xl font-bold text-ink">This Is It 💘</h2>
-      <p class="mt-1 text-sm text-ink/50">Hi, it's me {{ state.name }}!, Here's how I'd love to spend the day with you. Take one last look before we make it happen.</p>
+      <p class="mt-1 text-md font-writing text-ink/50">Hi, it's me <span class="text-rose-600 text-2xl">{{ state.name }}!</span> Here's how I'd love to spend the day with you. Take one last look before we make it happen.</p>
     </div>
 
     <div class="mt-6 flex justify-center">
       <div ref="cardRef" class="relative w-full">
+        <div class="relative overflow-hidden rounded-3xl border-2 border-rose-100/50 bg-white p-6 shadow-elegant-lg paper-texture linen">
 
-          <div class="relative overflow-hidden rounded-3xl border-2 border-rose-100/50 bg-white p-6 shadow-elegant-lg paper-texture linen">
+          <!-- Postage stamp badge -->
+          <div class="absolute -top-1 -right-1 flex items-center justify-center rounded-md border border-dashed border-rose-300/60 bg-rose-50/80 px-1.5 py-2 rotate-[8deg]">
+            <span class="text-[9px] font-bold uppercase tracking-widest text-rose-400 leading-none">You're<br>invited</span>
+          </div>
 
-            <!-- Postage stamp badge -->
-            <div class="absolute -top-1 -right-1 flex items-center justify-center rounded-md border border-dashed border-rose-300/60 bg-rose-50/80 px-1.5 py-2 rotate-[8deg]">
-              <span class="text-[9px] font-bold uppercase tracking-widest text-rose-400 leading-none">You're<br>invited</span>
-            </div>
+          <!-- Decorative top border -->
+          <!-- <div class="flex items-center gap-2 mb-4">
+            <div class="flex-1 h-px bg-rose-200/60" />
+            <span class="text-xs text-rose-300">💌</span>
+            <div class="flex-1 h-px bg-rose-200/60" />
+          </div> -->
 
-            <!-- Decorative top border -->
-            <div class="flex items-center gap-2 mb-4">
-              <div class="flex-1 h-px bg-rose-200/60" />
-              <span class="text-xs text-rose-300">💌</span>
-              <div class="flex-1 h-px bg-rose-200/60" />
-            </div>
+          <div class="relative flex flex-col items-stretch text-center">
 
-            <div class="relative flex flex-col items-stretch text-center">
+            <p class="font-hand text-3xl leading-tight text-rose-600">
+              Dear you ✨,
+            </p>
 
-              <p class="font-hand text-3xl leading-tight text-rose-600">
-                Dear you ✨,
-              </p>
-
-              <!-- Food items -->
-              <div class="mt-4 flex items-center justify-center gap-3">
-                <div
-                  v-for="item in state.foods"
-                  :key="item.id"
-                  class="flex h-14 w-14 items-center justify-center rounded-full bg-rose-50/60 shadow-elegant"
-                >
-                  <UiEmoji :e="item.emoji" size="h-8 w-8" />
-                </div>
+            <!-- Food items -->
+            <div class="mt-4 flex items-center justify-center gap-3">
+              <div
+                v-for="item in state.foods"
+                :key="item.id"
+                class="flex h-14 w-14 items-center justify-center rounded-full bg-rose-50/60 shadow-elegant"
+              >
+                <UiEmoji :e="item.emoji" size="h-8 w-8" />
               </div>
-              <p v-if="state.foods.length" class="mt-1.5 text-[11px] font-medium text-ink/40">
-                {{ state.foods.map(f => f.label).join(' · ') }}
-              </p>
+            </div>
+            <p v-if="state.foods.length" class="mt-1.5 text-[11px] font-medium text-ink/40">
+              {{ state.foods.map(f => f.label).join(' · ') }}
+            </p>
 
-              <!-- Date card -->
-              <div class="mt-4 flex w-full items-center gap-3 rounded-2xl border border-rose-100 bg-gradient-to-r from-rose-50 to-blush-50/60 p-3">
-                <div class="flex h-14 w-14 flex-none flex-col items-center justify-center rounded-xl bg-white shadow-elegant">
-                  <span class="text-[10px] font-bold uppercase text-rose-500">{{ monthShort }}</span>
-                  <span class="font-display text-xl font-bold leading-none text-ink">{{ dayNumber }}</span>
-                </div>
-                <div class="text-left">
-                  <p class="font-display text-sm font-bold text-ink">{{ formattedDate }}</p>
-                  <p class="text-xs font-semibold text-rose-600"><UiEmoji e="⏰" size="h-3.5 w-3.5" /> {{ formattedTime }}</p>
-                </div>
+            <!-- Date card -->
+            <div class="mt-4 flex w-full items-stretch gap-3 rounded-2xl border border-rose-100 bg-gradient-to-r from-rose-50 to-blush-50/60 p-3">
+              <div class="flex h-14 w-14 flex-none flex-col items-strech justify-center rounded-xl bg-white shadow-elegant">
+                <span class="text-[10px] font-bold uppercase text-rose-500">{{ monthShort }}</span>
+                <span class="font-display text-xl font-bold leading-none text-ink">{{ dayNumber }}</span>
               </div>
-
-              <p class="mt-4 font-hand text-sm text-ink/65">I hope you'll like what I picked for us. 🥹</p>
-
+              <div class="text-left">
+                <p class="font-display text-sm font-bold text-ink">{{ formattedDate }}</p>
+                <p class="text-xs font-semibold text-rose-600"><UiEmoji e="⏰" size="h-3.5 w-3.5" /> {{ formattedTime }}</p>
+              </div>
             </div>
 
-            <!-- Decorative bottom border -->
-            <div class="flex items-center gap-2 mt-4">
-              <div class="flex-1 h-px bg-rose-200/60" />
-              <span class="text-[9px] font-semibold uppercase tracking-[.3em] text-rose-300/80">with love</span>
-              <div class="flex-1 h-px bg-rose-200/60" />
-            </div>
+            <p class="mt-4 font-hand text-sm text-ink/65">I hope you'll like what I picked for us. 🥹</p>
 
           </div>
+
+          <!-- Decorative bottom border -->
+          <div class="flex items-center gap-2 mt-4">
+            <div class="flex-1 h-px bg-rose-200/60" />
+            <span class="text-xs text-rose-300">💌</span>
+            <div class="flex-1 h-px bg-rose-200/60" />
+          </div>
+
         </div>
+      </div>
     </div>
     <!-- end for downloadable card -->
 

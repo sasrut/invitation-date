@@ -5,14 +5,11 @@ import { useInvitation } from '~/composables/useInvitation';
 const { state } = useInvitation() 
 
 const name = ref(state.value.name)
-const phone = ref(state.value.crushPhone)
 const touched = ref(false)
 
 const nameError = computed(() => touched.value && !name.value.trim() ? 'Tell us what to call you 🥺' : '')
-const phoneValid = computed(() => phone.value.replace(/\D/g, '').length >= 8)
-const phoneError = computed(() => touched.value && !phoneValid.value ? 'That number looks a little short' : '')
 
-const canSubmit = computed(() => name.value.trim().length > 0 && phoneValid.value)
+const canSubmit = computed(() => name.value.trim().length > 0)
 
 const emit = defineEmits<{ next: [] }>()
 
@@ -20,7 +17,6 @@ function submit () {
   touched.value = true
   if (!canSubmit.value) return
   state.value.name = name.value.trim()
-  state.value.crushPhone = phone.value.trim()
   emit('next')
 }
 </script>
@@ -34,12 +30,12 @@ function submit () {
       I Hope You'll Say Yes
     </h1>
     <p class="mt-1 text-center text-xs text-ink/55">
-      Just a couple of details before I ask if you'd like to spend some time with me.
+      Just a quick detail before I ask if you'd like to spend some time with me.
     </p>
 
     <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
       <label class="block">
-        <span class="mb-1 block text-xs font-semibold text-rose-600">Your lovely name</span>
+        <span class="mb-1 block text-xs font-semibold text-rose-600">What do i call you?</span>
         <input
           v-model="name"
           type="text"
@@ -47,19 +43,6 @@ function submit () {
           class="input-glow w-full rounded-2xl border-2 border-rose-200 bg-rose-50/50 px-4 py-3 text-sm font-medium text-ink placeholder:text-ink/25 outline-none transition-colors"
         >
         <span v-if="nameError" class="mt-1 block text-xs text-rose-500">{{ nameError }}</span>
-      </label>
-
-      <label class="block">
-        <span class="mb-1 block text-xs font-semibold text-rose-600">Your crush's phone number</span>
-        <input
-          v-model="phone"
-          type="tel"
-          inputmode="tel"
-          placeholder="e.g. 6281234567890"
-          class="input-glow w-full rounded-2xl border-2 border-rose-200 bg-rose-50/50 px-4 py-3 text-sm font-medium text-ink placeholder:text-ink/25 outline-none transition-colors"
-        >
-        <span v-if="phoneError" class="mt-1 block text-xs text-rose-500">{{ phoneError }}</span>
-        <span v-else class="mt-1 block text-[11px] text-ink/35">We'll use this only to open WhatsApp for you later 💌</span>
       </label>
 
       <button

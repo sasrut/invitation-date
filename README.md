@@ -21,7 +21,7 @@ node .output/server/index.mjs
 1. **Modal — your name & your crush's number.** Blocking modal on first load, collects your name and your crush's WhatsApp number. Stored only in-memory (no backend, no database).
 2. **Menu — food bubbles → basket.** 20 food bubbles you can drag (press-and-drag, works with touch and mouse via Pointer Events) into the basket, max 3. Tapping a bubble also adds it directly — a friendly fallback for quick mobile taps.
 3. **Date & time.** Native `<input type="date">` and `<input type="time">` for the best mobile picker experience, wrapped in the app's own styling.
-4. **Overview card.** A downloadable card (name → food icons → highlighted date) rendered with `html-to-image`.
+4. **Overview card.** A downloadable card (name → food icons → highlighted date) rendered with `html2canvas`.
    - **Download** saves the card as a PNG.
    - **Send** tries the native Web Share API first (lets you pick WhatsApp directly and attach the image in one step, on supporting mobile browsers). If that's not available, it downloads the PNG and opens a WhatsApp chat with your crush's number pre-filled with a message — just attach the image that was saved.
 
