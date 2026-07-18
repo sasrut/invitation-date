@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   ssr: false, // SPA mode — this app is entirely client-driven (drag/drop, canvas export), no DB / server needed
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
+  nitro: {
+    preset: 'static'
+  },
   app: {
     head: {
       title: 'You, Me & a Date 💌',
