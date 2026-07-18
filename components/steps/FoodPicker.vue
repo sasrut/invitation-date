@@ -13,6 +13,8 @@ const basketActive = ref(false)
 const shake = ref(false)
 let startPos = { x: 0, y: 0 }
 let moved = false
+let pendingItem: FoodItem | null = null
+let dragTimer: ReturnType<typeof setTimeout> | null = null
 
 function pointInBasket (x: number, y: number) {
   if (!basketRef.value) return false
@@ -20,15 +22,44 @@ function pointInBasket (x: number, y: number) {
   return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom
 }
 
+function cleanupHold() {
+  if (dragTimer) { clearTimeout(dragTimer); dragTimer = null }
+  window.removeEventListener('pointermove', onHoldMove)
+  window.removeEventListener('pointerup', onHoldUp)
+}
+
+function onHoldMove(e: PointerEvent) {
+  if (Math.abs(e.clientX - startPos.x) > 6 || Math.abs(e.clientY - startPos.y) > 6) {
+    cleanupHold()
+    pendingItem = null
+  }
+}
+
+function onHoldUp(_e: PointerEvent) {
+  cleanupHold()
+  if (pendingItem) {
+    tryAdd(pendingItem)
+    pendingItem = null
+  }
+}
+
 function onPointerDown (e: PointerEvent, item: FoodItem) {
   if (isFoodSelected(item.id)) return
-  dragging.value = item
+  pendingItem = item
   startPos = { x: e.clientX, y: e.clientY }
-  pointer.x = e.clientX
-  pointer.y = e.clientY
   moved = false
-  window.addEventListener('pointermove', onPointerMove)
-  window.addEventListener('pointerup', onPointerUp)
+
+  window.addEventListener('pointermove', onHoldMove)
+  window.addEventListener('pointerup', onHoldUp)
+
+  dragTimer = setTimeout(() => {
+    cleanupHold()
+    dragging.value = pendingItem
+    pointer.x = e.clientX
+    pointer.y = e.clientY
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerUp)
+  }, 300)
 }
 
 function onPointerMove (e: PointerEvent) {
@@ -52,6 +83,7 @@ function onPointerUp (e: PointerEvent) {
   const item = dragging.value
   dragging.value = null
   basketActive.value = false
+  pendingItem = null
   if (!item) return
 
   if (!moved) {
@@ -64,6 +96,7 @@ function onPointerUp (e: PointerEvent) {
 }
 
 onBeforeUnmount(() => {
+  cleanupHold()
   window.removeEventListener('pointermove', onPointerMove)
   window.removeEventListener('pointerup', onPointerUp)
 })

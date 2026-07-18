@@ -92,7 +92,8 @@ async function handleSend () {
     triggerDownload(dataUrl)
     const phone = state.value.crushPhone.replace(/\D/g, '')
     const text = encodeURIComponent(`${shareText} I just saved the invite card — attaching it right here!`)
-    window.open(`https://wa.me/${phone}?text=${text}`, '_blank')
+    window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    // window.open(`https://wa.me/${phone}?text=${text}`, '_blank')
     note.value = 'Yeayy! Card saved — attach it in the WhatsApp chat that just opened 💬'
     noteType.value = 'success'
   } catch (err: any) {

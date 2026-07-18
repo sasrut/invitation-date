@@ -10,7 +10,7 @@ defineProps<{
 <template>
   <button
     type="button"
-    class="no-select group flex flex-col items-center gap-1.5 rounded-2xl p-2 transition-transform"
+    class="select-none group flex flex-col items-center gap-1.5 rounded-2xl p-2 transition-transform"
     :class="disabled ? 'opacity-30 pointer-events-none' : 'active:scale-95'"
   >
     <div
