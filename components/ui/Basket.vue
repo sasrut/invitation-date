@@ -17,7 +17,7 @@ const emit = defineEmits<{ remove: [id: string] }>()
   >
     <div
       class="pointer-events-none absolute inset-0 flex items-center justify-center select-none transition-all duration-200"
-      :class="active ? 'opacity-30' : 'opacity-20'"
+      :class="active ? 'opacity-40' : 'opacity-15'"
     >
       <img src="/shopping-basket.png" class="w-full h-full object-contain object-bottom" alt="" />
     </div>

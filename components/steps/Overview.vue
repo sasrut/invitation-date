@@ -7,7 +7,7 @@ const { state, formattedDate, formattedTime } = useInvitation()
 const emit = defineEmits<{ back: [] }>()
 
 const cardRef = ref<HTMLElement | null>(null)
-const EXPORT_WIDTH = 1200
+const EXPORT_WIDTH = 680
 const busy = ref<'send' | 'download' | null>(null)
 const note = ref('')
 const noteType = ref<'success' | 'error' | null>(null)
@@ -27,10 +27,10 @@ watch(note, (val) => {
 const dayNumber = computed(() => state.value.date ? new Date(`${state.value.date}T00:00:00`).getDate() : '')
 const monthShort = computed(() => state.value.date ? new Date(`${state.value.date}T00:00:00`).toLocaleDateString('en-US', { month: 'short' }) : '')
 
-function resetCardWidth() {
-  if (!cardRef.value) return
-  cardRef.value.style.width = ''
-  cardRef.value.style.maxWidth = ''
+function cleanupExport(container: HTMLElement | null) {
+  if (container?.parentNode) {
+    container.remove()
+  }
 }
 
 async function renderCard () {
@@ -43,10 +43,21 @@ async function renderCard () {
         img.addEventListener('load', resolve, { once: true })
         img.addEventListener('error', resolve, { once: true })
       })))
-  await new Promise(r => setTimeout(r, 200))
-  cardRef.value.style.width = `${EXPORT_WIDTH}px`
-  cardRef.value.style.maxWidth = `${EXPORT_WIDTH}px`
-  return cardRef.value
+
+  const wrapper = document.createElement('div')
+  wrapper.style.cssText = `position:fixed;left:-9999px;top:0;width:${EXPORT_WIDTH}px;max-width:none;`
+
+  const clone = cardRef.value.cloneNode(true) as HTMLElement
+  clone.style.width = `${EXPORT_WIDTH}px`
+  clone.style.maxWidth = `${EXPORT_WIDTH}px`
+
+  wrapper.appendChild(clone)
+  document.body.appendChild(wrapper)
+
+  clone.offsetHeight
+  await new Promise(r => requestAnimationFrame(r))
+
+  return { element: clone as HTMLElement, wrapper }
 }
 
 function triggerDownload (dataUrl: string) {
@@ -59,13 +70,13 @@ function triggerDownload (dataUrl: string) {
 }
 
 async function handleDownload () {
-  const el = await renderCard()
-  if (!el) return
+  const result = await renderCard()
+  if (!result) return
   busy.value = 'download'
   note.value = ''
   noteType.value = null
   try {
-    const dataUrl = await toPng(el, { pixelRatio: 1 })
+    const dataUrl = await toPng(result.element, { pixelRatio: 1, width: EXPORT_WIDTH })
     triggerDownload(dataUrl)
     note.value = 'Yeayy! The card has been downloaded! 💾'
     noteType.value = 'success'
@@ -74,7 +85,7 @@ async function handleDownload () {
     noteType.value = 'error'
   } finally {
     busy.value = null
-    resetCardWidth()
+    cleanupExport(result.wrapper)
   }
 }
 
@@ -83,41 +94,25 @@ async function handleSend () {
   const shareText = `Hi! ${state.value.name || 'Someone'} sent you a little date invitation 💌`
   const waText = encodeURIComponent(`${shareText} I just saved the invite card — attaching it right here!`)
   const waUrl = `https://wa.me/${phone}?text=${waText}`
-  const waWindow = window.open(waUrl, '_blank')
+  window.open(waUrl, '_blank')
 
-  const el = await renderCard()
-  if (!el) { waWindow?.close(); return }
+  const result = await renderCard()
+  if (!result) return
   busy.value = 'send'
   note.value = ''
   noteType.value = null
 
   try {
-    const blob = await toBlob(el, { pixelRatio: 1 })
-    if (!blob) throw new Error('no blob')
-
-    const file = new File([blob], 'date-invite.png', { type: 'image/png' })
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'A date invitation 💌', text: shareText })
-      waWindow?.close()
-      note.value = 'Yeayy! The card has been sent! 💌'
-      noteType.value = 'success'
-      return
-    }
-
-    const dataUrl = await toPng(el, { pixelRatio: 1 })
+    const dataUrl = await toPng(result.element, { pixelRatio: 1, width: EXPORT_WIDTH })
     triggerDownload(dataUrl)
     note.value = 'Yeayy! Card saved — attach it in the WhatsApp chat that just opened 💬'
     noteType.value = 'success'
   } catch (err: any) {
-    waWindow?.close()
-    if (err?.name !== 'AbortError') {
-      note.value = 'Could not open share — try Download instead.'
-      noteType.value = 'error'
-    }
+    note.value = 'Could not create the image. Try again?'
+    noteType.value = 'error'
   } finally {
     busy.value = null
-    resetCardWidth()
+    cleanupExport(result.wrapper)
   }
 }
 </script>
@@ -146,7 +141,7 @@ async function handleSend () {
               <div class="flex-1 h-px bg-rose-200/60" />
             </div>
 
-            <div class="relative flex flex-col items-center text-center">
+            <div class="relative flex flex-col items-stretch text-center">
 
               <p class="font-hand text-3xl leading-tight text-rose-600">
                 Dear you ✨,

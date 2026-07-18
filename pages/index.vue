@@ -50,7 +50,7 @@ function skipIntro() {
     <Transition name="reveal">
       <div
         v-if="introPhase === 'envelope' || introPhase === 'done'"
-        class="animate-reveal-in relative w-full max-w-sm sm:max-w-md"
+        class="animate-reveal-in relative w-full lg:max-w-md mx-auto"
         style="padding-top:88px"
       >
         <div
